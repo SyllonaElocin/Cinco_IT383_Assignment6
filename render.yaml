@@ -1,0 +1,24 @@
+services:
+  - type: pserv
+    name: photo-album-db
+    plan: free
+    database: photo_album
+    user: postgres
+    
+  - type: web
+    name: photo-album-app
+    plan: free
+    env:
+      PYTHON_VERSION: 3.11.0
+    buildCommand: pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
+    startCommand: gunicorn config.wsgi:application
+    envVars:
+      - key: DEBUG
+        value: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromService:
+          type: pserv
+          name: photo-album-db
+          property: connectionString

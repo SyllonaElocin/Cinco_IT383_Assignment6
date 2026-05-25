@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ album.name }} - Photo Album Manager{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Album Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="page-title">{{ album.name }}</h1>
+            <p class="text-muted">By <strong>{{ album.owner.username }}</strong></p>
+            {% if album.is_public %}
+                <span class="badge bg-success">Public</span>
+            {% else %}
+                <span class="badge bg-warning">Private</span>
+            {% endif %}
+        </div>
+        <div class="col-md-4 text-end">
+            {% if can_edit %}
+                <a href="{% url 'album:album-update' album.pk %}" class="btn btn-warning">Edit Album</a>
+                <a href="{% url 'album:photo-upload' album.pk %}" class="btn btn-primary">+ Add Photo</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Album Description -->
+    {% if album.description %}
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <p class="lead">{{ album.description }}</p>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Photos Grid -->
+    {% if album.photos.all %}
+        <div class="row">
+            {% for photo in album.photos.all %}
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card photo-card">
+                        <img src="{{ photo.image.url }}" class="card-img-top" alt="{{ photo.title }}">
+                        <div class="card-body">
+                            {% if photo.title %}
+                                <h5 class="card-title">{{ photo.title|truncatewords:5 }}</h5>
+                            {% else %}
+                                <h5 class="card-title">Untitled</h5>
+                            {% endif %}
+                            {% if photo.description %}
+                                <p class="card-text text-muted">{{ photo.description|truncatewords:10 }}</p>
+                            {% endif %}
+                            <small class="text-muted">{{ photo.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        {% if can_edit %}
+                            <div class="card-footer bg-light">
+                                <div class="btn-group btn-group-sm w-100" role="group">
+                                    <a href="{% url 'album:photo-edit' photo.pk %}" class="btn btn-warning">Edit</a>
+                                    <a href="{% url 'album:photo-delete' photo.pk %}" class="btn btn-danger">Delete</a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center py-5">
+            <h4>No photos in this album yet</h4>
+            {% if can_edit %}
+                <p>Add your first photo to get started!</p>
+                <a href="{% url 'album:photo-upload' album.pk %}" class="btn btn-primary mt-3">+ Add Photo</a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <a href="{% url 'album:album-list' %}" class="btn btn-secondary">← Back to Albums</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

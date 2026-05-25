@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Photo Album Manager{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Welcome to Photo Album Manager</h1>
+        <p class="lead mt-3">Store, organize, and share your favorite memories</p>
+        {% if user.is_authenticated %}
+            <div class="mt-4">
+                <a href="{% url 'album:album-create' %}" class="btn btn-light btn-lg me-2">Create Album</a>
+                <a href="{% url 'album:user-albums' %}" class="btn btn-outline-light btn-lg">View My Albums</a>
+            </div>
+        {% else %}
+            <div class="mt-4">
+                <a href="{% url 'login' %}" class="btn btn-light btn-lg me-2">Login</a>
+                <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg">Register</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">📷 Organize</h5>
+                    <p class="card-text">Create albums to organize your photos by event, location, or theme.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">☁️ Cloud Storage</h5>
+                    <p class="card-text">All your photos are securely stored in the cloud with Cloudinary.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">🔒 Secure</h5>
+                    <p class="card-text">Control who sees your albums with public and private options.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

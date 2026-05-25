@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}My Albums - Photo Album Manager{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="page-title">📁 My Albums</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'album:album-create' %}" class="btn btn-primary">+ Create New Album</a>
+        </div>
+    </div>
+
+    {% if albums %}
+        <div class="album-grid">
+            {% for album in albums %}
+                <div class="card album-card">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0">{{ album.name }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text text-muted">{{ album.description|truncatewords:15 }}</p>
+                        <p class="card-text"><small>📷 Photos: {{ album.get_photo_count }}</small></p>
+                        <p class="card-text"><small>Created: {{ album.created_at|date:"M d, Y" }}</small></p>
+                        {% if album.is_public %}
+                            <span class="badge bg-success">Public</span>
+                        {% else %}
+                            <span class="badge bg-warning">Private</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-light">
+                        <div class="btn-group btn-group-sm w-100" role="group">
+                            <a href="{% url 'album:album-detail' album.pk %}" class="btn btn-primary">View</a>
+                            <a href="{% url 'album:album-update' album.pk %}" class="btn btn-warning">Edit</a>
+                            <a href="{% url 'album:photo-upload' album.pk %}" class="btn btn-success">+ Photo</a>
+                            <a href="{% url 'album:album-delete' album.pk %}" class="btn btn-danger">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+            <nav aria-label="Page navigation" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">First</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info text-center py-5">
+            <h4>No albums yet</h4>
+            <p>Create your first album to get started!</p>
+            <a href="{% url 'album:album-create' %}" class="btn btn-primary mt-3">Create Album</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
