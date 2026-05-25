@@ -15,7 +15,7 @@ class IsOwnerOrAdminMixin(UserPassesTestMixin):
     """
     def test_func(self):
         obj = self.get_object()
-        user = self.user
+        user = self.request.user
         is_admin = hasattr(user, 'profile') and user.profile.role == 'admin'
         return obj.owner == user or is_admin
 
@@ -71,7 +71,7 @@ class AlbumCreateView(LoginRequiredMixin, CreateView):
     model = Album
     form_class = AlbumForm
     template_name = 'album/album_form.html'
-    success_url = reverse_lazy('album-list')
+    success_url = reverse_lazy('album:album-list')
     
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -88,7 +88,7 @@ class AlbumUpdateView(LoginRequiredMixin, IsOwnerOrAdminMixin, UpdateView):
     slug_url_kwarg = 'pk'
     
     def get_success_url(self):
-        return reverse_lazy('album-detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('album:album-detail', kwargs={'pk': self.object.pk})
     
     def form_valid(self, form):
         messages.success(self.request, 'Album updated successfully!')
@@ -99,7 +99,7 @@ class AlbumDeleteView(LoginRequiredMixin, IsOwnerOrAdminMixin, DeleteView):
     """Delete an album"""
     model = Album
     template_name = 'album/album_confirm_delete.html'
-    success_url = reverse_lazy('album-list')
+    success_url = reverse_lazy('album:album-list')
     slug_field = 'pk'
     slug_url_kwarg = 'pk'
     
@@ -124,7 +124,7 @@ class PhotoCreateView(LoginRequiredMixin, CreateView):
         is_admin = hasattr(request.user, 'profile') and request.user.profile.role == 'admin'
         if album.owner != request.user and not is_admin:
             messages.error(request, 'You do not have permission to add photos to this album.')
-            return redirect('album-detail', pk=album.pk)
+            return redirect('album:album:album-detail', pk=album.pk)
         return super().dispatch(request, *args, **kwargs)
     
     def form_valid(self, form):
@@ -133,7 +133,7 @@ class PhotoCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
     
     def get_success_url(self):
-        return reverse_lazy('album-detail', kwargs={'pk': self.kwargs['album_pk']})
+        return reverse_lazy('album:album-detail', kwargs={'pk': self.kwargs['album_pk']})
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -155,7 +155,7 @@ class PhotoUpdateView(LoginRequiredMixin, UpdateView):
         is_admin = hasattr(request.user, 'profile') and request.user.profile.role == 'admin'
         if photo.album.owner != request.user and not is_admin:
             messages.error(request, 'You do not have permission to edit this photo.')
-            return redirect('album-detail', pk=photo.album.pk)
+            return redirect('album:album-detail', pk=photo.album.pk)
         return super().dispatch(request, *args, **kwargs)
     
     def form_valid(self, form):
@@ -163,7 +163,7 @@ class PhotoUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
     
     def get_success_url(self):
-        return reverse_lazy('album-detail', kwargs={'pk': self.object.album.pk})
+        return reverse_lazy('album:album-detail', kwargs={'pk': self.object.album.pk})
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -184,7 +184,7 @@ class PhotoDeleteView(LoginRequiredMixin, DeleteView):
         is_admin = hasattr(request.user, 'profile') and request.user.profile.role == 'admin'
         if photo.album.owner != request.user and not is_admin:
             messages.error(request, 'You do not have permission to delete this photo.')
-            return redirect('album-detail', pk=photo.album.pk)
+            return redirect('album:album-detail', pk=photo.album.pk)
         return super().dispatch(request, *args, **kwargs)
     
     def delete(self, request, *args, **kwargs):
@@ -192,7 +192,7 @@ class PhotoDeleteView(LoginRequiredMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
     
     def get_success_url(self):
-        return reverse_lazy('album-detail', kwargs={'pk': self.object.album.pk})
+        return reverse_lazy('album:album-detail', kwargs={'pk': self.object.album.pk})
 
 
 # ============ DASHBOARD / USER ALBUMS ============
